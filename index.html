@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="doc-title">Aethelgard Gaming Guild</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .editable-active {
+            outline: 2px dashed #6366f1 !important;
+            outline-offset: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .editable-active:hover {
+            background-color: rgba(99, 102, 241, 0.15) !important;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- ADMIN BAR -->
+    <div id="admin-bar" class="bg-indigo-950 border-b border-indigo-800/50 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 text-indigo-200">
+        <div class="flex items-center gap-2">
+            <span id="admin-status-badge" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-400">Visitor Mode</span>
+            <span id="admin-hint" class="text-indigo-300/70 hidden sm:inline">Log in as admin to edit text, stats, and rules in real-time for everyone.</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="toggle-admin-btn" onclick="toggleAdminLogin()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-3 py-1 rounded flex items-center gap-1.5 transition">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                <span id="admin-btn-text">Admin Login</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN NAVBAR -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-indigo-500/30">
+                    <span id="nav-initials">AG</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight editable-field" data-key="guildName">Aethelgard Guild</h1>
+                    <p class="text-xs text-slate-400 editable-field" data-key="guildTagline">Hardcore PvE & PvP Community</p>
+                </div>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#stats" class="hover:text-indigo-400 transition">Status</a>
+                <a href="#events" class="hover:text-indigo-400 transition">Events</a>
+                <a href="#rules" class="hover:text-indigo-400 transition">Rules</a>
+                <a href="#apply" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition shadow-md shadow-indigo-600/20">Apply Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative border-b border-slate-800 bg-gradient-to-b from-slate-900 via-indigo-950/20 to-slate-950 py-16 px-4 sm:px-6 text-center overflow-hidden">
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-6">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span class="editable-field" data-key="heroBadge">Recruitment Season Active</span>
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white mb-4 editable-field" data-key="heroTitle">
+                Dominate The Realm Together.
+            </h1>
+            
+            <p class="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-8 editable-field" data-key="heroSubtitle">
+                We are an organized, high-performing gaming syndicate dedicated to endgame raiding, territory wars, and fostering a friendly community.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="#apply" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    Join Our Ranks
+                </a>
+                <a href="#events" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold px-6 py-3 rounded-xl transition flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    View Raid Schedule
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 space-y-16">
+
+        <!-- LIVE STATS / DASHBOARD CARDS -->
+        <section id="stats">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-white editable-field" data-key="statsHeading">Guild Live Overview</h2>
+                    <p class="text-slate-400 text-sm editable-field" data-key="statsSubheading">Real-time status metrics and recruitment operational info.</p>
+                </div>
+                <button id="add-stat-btn" onclick="openStatModal()" class="hidden bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add Metric
+                </button>
+            </div>
+
+            <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Dynamically Populated -->
+            </div>
+        </section>
+
+        <!-- EVENTS & RECRUITMENT RULES -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- UPCOMING EVENTS (2 Cols) -->
+            <section id="events" class="lg:col-span-2 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white editable-field" data-key="eventsHeading">Guild Events & Raids</h2>
+                        <p class="text-slate-400 text-sm editable-field" data-key="eventsSubheading">Check out our schedule for raids, tournaments, and meetings.</p>
+                    </div>
+                    <button id="add-event-btn" onclick="openEventModal()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Event
+                    </button>
+                </div>
+
+                <div id="events-list" class="space-y-4">
+                    <!-- Dynamically Populated -->
+                </div>
+            </section>
+
+            <!-- GUILD RULES & CODE OF CONDUCT (1 Col) -->
+            <section id="rules" class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white editable-field" data-key="rulesHeading">Guild Rules</h2>
+                        <p class="text-slate-400 text-sm editable-field" data-key="rulesSubheading">Core standards every member adheres to.</p>
+                    </div>
+                    <button id="add-rule-btn" onclick="openRuleModal()" class="hidden bg-slate-800 hover:bg-slate-700 border border-slate-700 text-indigo-400 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Rule
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <ul id="rules-list" class="space-y-4">
+                        <!-- Dynamically Populated -->
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- RECRUITMENT APPLICATION FORM -->
+        <section id="apply" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-10 relative overflow-hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2 editable-field" data-key="formHeading">Apply For Membership</h2>
+                    <p class="text-slate-400 text-sm editable-field" data-key="formSubheading">Fill out the official application form below. Our officers review applications within 24 hours.</p>
+                </div>
+
+                <form id="app-form" onsubmit="handleAppSubmit(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">In-Game Username / Tag *</label>
+                        <input type="text" id="app-name" required placeholder="e.g., ShadowKnight#1234" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Primary Class / Specialty *</label>
+                            <input type="text" id="app-class" required placeholder="e.g., Tank / Paladin" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Discord Username *</label>
+                            <input type="text" id="app-discord" required placeholder="e.g., player_one" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Experience & Achievements *</label>
+                        <textarea id="app-experience" rows="4" required placeholder="Tell us about your past guild experience, raiding history, or why you want to join..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        Submit Guild Application
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ADMIN APPLICATIONS INBOX (Visible only when logged in) -->
+        <section id="admin-inbox-section" class="hidden border-t-2 border-indigo-500/30 pt-12">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="inbox" class="w-6 h-6 text-indigo-400"></i>
+                        Submitted Applications
+                    </h2>
+                    <p class="text-slate-400 text-sm">Review, approve, or reject incoming player applications in real time.</p>
+                </div>
+            </div>
+
+            <div id="apps-container" class="space-y-4">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 bg-slate-900 py-8 px-4 text-center text-slate-500 text-sm">
+        <p>© 2026 <span class="editable-field" data-key="guildName">Aethelgard Guild</span> Hub. All rights reserved.</p>
+    </footer>
+
+    <!-- MODAL: EVENT ADD/EDIT -->
+    <div id="event-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4">
+            <h3 id="event-modal-title" class="text-lg font-bold text-white">Add Guild Event</h3>
+            <form onsubmit="saveEvent(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Event Title</label>
+                    <input type="text" id="event-title" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Date / Time Description</label>
+                    <input type="text" id="event-date" required placeholder="e.g., Friday @ 20:00 UTC" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Event Type / Tag</label>
+                    <input type="text" id="event-tag" placeholder="e.g., Main Raid, PvP, Casual" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeEventModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Save Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: STAT METRIC ADD/EDIT -->
+    <div id="stat-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4">
+            <h3 class="text-lg font-bold text-white">Add Metric Card</h3>
+            <form onsubmit="saveStat(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Label</label>
+                    <input type="text" id="stat-label" required placeholder="e.g., Active Members" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Value / Status</label>
+                    <input type="text" id="stat-value" required placeholder="e.g., 142 / 150" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeStatModal()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Save Metric</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIREBASE MODULE & REAL-TIME SYNC LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const DEFAULT_DATA = {
+            texts: {
+                guildName: "Aethelgard Guild",
+                guildTagline: "Hardcore PvE & PvP Community",
+                heroBadge: "Recruitment Season Active",
+                heroTitle: "Dominate The Realm Together.",
+                heroSubtitle: "We are an organized, high-performing gaming syndicate dedicated to endgame raiding, territory wars, and fostering a friendly community.",
+                statsHeading: "Guild Live Overview",
+                statsSubheading: "Real-time status metrics and recruitment operational info.",
+                eventsHeading: "Guild Events & Raids",
+                eventsSubheading: "Check out our schedule for raids, tournaments, and meetings.",
+                rulesHeading: "Guild Rules",
+                rulesSubheading: "Core standards every member adheres to.",
+                formHeading: "Apply For Membership",
+                formSubheading: "Fill out the official application form below. Our officers review applications within 24 hours."
+            },
+            stats: [
+                { id: "1", label: "Server Status", value: "Online (EU-Main)" },
+                { id: "2", label: "Active Members", value: "128 / 150" },
+                { id: "3", label: "Raid Progress", value: "8/8 Mythic" },
+                { id: "4", label: "Recruitment", value: "Open (DPS/Heal)" }
+            ],
+            events: [
+                { id: "1", title: "Main Team Heroic/Mythic Raid", date: "Friday @ 20:00 UTC", tag: "Raid" },
+                { id: "2", title: "Community PvP War Games", date: "Saturday @ 18:00 UTC", tag: "PvP" },
+                { id: "3", title: "Weekly Officer Sync", date: "Sunday @ 19:00 UTC", tag: "Meeting" }
+            ],
+            rules: [
+                { id: "1", text: "Respect all guildmates and community players. Harassment is strictly prohibited." },
+                { id: "2", text: "Notify officers on Discord if you will be absent for longer than 7 days." },
+                { id: "3", text: "Be prepared with consumables and voice comms prior to raid start times." }
+            ],
+            applications: []
+        };
+
+        let appData = { ...DEFAULT_DATA };
+        let isAdmin = false;
+
+        // Setup Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-guild-hub';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : { apiKey: "demo", authDomain: "demo.firebaseapp.com", projectId: "demo-project" };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Document Reference following strict Rule 1
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guild_data', 'main_hub');
+
+        // Authenticate before query
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth error:", err);
+            }
+            setupFirestoreListener();
+        }
+
+        function setupFirestoreListener() {
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    appData = {
+                        texts: { ...DEFAULT_DATA.texts, ...data.texts },
+                        stats: data.stats || DEFAULT_DATA.stats,
+                        events: data.events || DEFAULT_DATA.events,
+                        rules: data.rules || DEFAULT_DATA.rules,
+                        applications: data.applications || DEFAULT_DATA.applications
+                    };
+                } else {
+                    // Seed Firestore if empty
+                    syncToCloud();
+                }
+                renderAll();
+            }, (error) => {
+                console.error("Realtime sync error:", error);
+            });
+        }
+
+        async function syncToCloud() {
+            try {
+                await setDoc(docRef, appData);
+            } catch (e) {
+                console.error("Error syncing data to cloud:", e);
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderAll() {
+            // Render Text Fields
+            document.querySelectorAll('.editable-field').forEach(el => {
+                const key = el.dataset.key;
+                if (appData.texts && appData.texts[key]) {
+                    el.innerText = appData.texts[key];
+                }
+            });
+
+            // Sync document title and initials
+            const gName = (appData.texts && appData.texts.guildName) || "Aethelgard Guild";
+            document.title = gName;
+            const initials = gName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('nav-initials').innerText = initials || "GH";
+
+            renderStats();
+            renderEvents();
+            renderRules();
+            renderApplications();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-grid');
+            container.innerHTML = (appData.stats || []).map(s => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 relative group">
+                    <span class="text-xs font-semibold text-slate-400 block mb-1">${escapeHtml(s.label)}</span>
+                    <span class="text-xl font-bold text-white block">${escapeHtml(s.value)}</span>
+                    ${isAdmin ? `
+                        <button onclick="window.deleteStat('${s.id}')" class="absolute top-3 right-3 text-red-400 hover:text-red-300 text-xs bg-red-500/10 p-1.5 rounded-lg">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('events-list');
+            container.innerHTML = (appData.events || []).map(e => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center justify-between gap-4">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 rounded-xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 hidden sm:block">
+                            <i data-lucide="swords" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-indigo-300">${escapeHtml(e.tag || 'Event')}</span>
+                                <span class="text-xs text-slate-400">${escapeHtml(e.date)}</span>
+                            </div>
+                            <h3 class="font-bold text-white">${escapeHtml(e.title)}</h3>
+                        </div>
+                    </div>
+                    ${isAdmin ? `
+                        <button onclick="window.deleteEvent('${e.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-500/10 rounded-lg text-xs">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderRules() {
+            const container = document.getElementById('rules-list');
+            container.innerHTML = (appData.rules || []).map((r, idx) => `
+                <li class="flex items-start justify-between gap-3 text-sm text-slate-300">
+                    <div class="flex items-start gap-3">
+                        <span class="font-bold text-indigo-400">${idx + 1}.</span>
+                        <span>${escapeHtml(r.text)}</span>
+                    </div>
+                    ${isAdmin ? `
+                        <button onclick="window.deleteRule('${r.id}')" class="text-red-400 hover:text-red-300 shrink-0">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </li>
+            `).join('');
+        }
+
+        function renderApplications() {
+            const container = document.getElementById('apps-container');
+            if (!appData.applications || appData.applications.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-500 bg-slate-900 border border-slate-800 rounded-xl">No applications received yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = appData.applications.map(app => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="font-bold text-white text-lg">${escapeHtml(app.name)}</span>
+                            <span class="text-xs text-slate-400 ml-2">Discord: <strong class="text-slate-200">${escapeHtml(app.discord)}</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs px-2.5 py-1 rounded-full font-semibold bg-amber-500/10 text-amber-400">${escapeHtml(app.status)}</span>
+                            <button onclick="window.deleteApp('${app.id}')" class="text-slate-500 hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-400">
+                        <div>Class/Role: <strong class="text-indigo-300">${escapeHtml(app.classRole)}</strong></div>
+                        <div>Date: <strong class="text-slate-300">${app.date}</strong></div>
+                    </div>
+                    <p class="text-xs text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800/80">${escapeHtml(app.experience)}</p>
+                </div>
+            `).join('');
+        }
+
+        // --- INLINE EDITORS ---
+        function setupInlineEditors() {
+            document.querySelectorAll('.editable-field').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (!isAdmin) return;
+                    e.preventDefault();
+                    
+                    const key = el.dataset.key;
+                    const currentValue = (appData.texts && appData.texts[key]) || el.innerText;
+                    const newValue = prompt(`Edit text for [${key}]:`, currentValue);
+
+                    if (newValue !== null && newValue.trim() !== "") {
+                        if (!appData.texts) appData.texts = {};
+                        appData.texts[key] = newValue.trim();
+                        syncToCloud();
+                    }
+                });
+            });
+        }
+
+        // --- ADMIN LOGIN LOGIC ---
+        window.toggleAdminLogin = function() {
+            if (isAdmin) {
+                isAdmin = false;
+                updateAdminUI();
+            } else {
+                const pass = prompt("Enter Admin Passcode:");
+                if (pass === "admin123") {
+                    isAdmin = true;
+                    updateAdminUI();
+                } else if (pass !== null) {
+                    alert("Incorrect passcode!");
+                }
+            }
+        };
+
+        function updateAdminUI() {
+            const badge = document.getElementById('admin-status-badge');
+            const btnText = document.getElementById('admin-btn-text');
+            const inbox = document.getElementById('admin-inbox-section');
+
+            if (isAdmin) {
+                badge.innerText = "Admin Editing Active";
+                badge.className = "px-2 py-0.5 rounded font-bold bg-indigo-600 text-white";
+                btnText.innerText = "Exit Admin";
+                inbox.classList.remove('hidden');
+
+                document.getElementById('add-stat-btn').classList.remove('hidden');
+                document.getElementById('add-event-btn').classList.remove('hidden');
+                document.getElementById('add-rule-btn').classList.remove('hidden');
+
+                document.querySelectorAll('.editable-field').forEach(el => el.classList.add('editable-active'));
+            } else {
+                badge.innerText = "Visitor Mode";
+                badge.className = "px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-400";
+                btnText.innerText = "Admin Login";
+                inbox.classList.add('hidden');
+
+                document.getElementById('add-stat-btn').classList.add('hidden');
+                document.getElementById('add-event-btn').classList.add('hidden');
+                document.getElementById('add-rule-btn').classList.add('hidden');
+
+                document.querySelectorAll('.editable-field').forEach(el => el.classList.remove('editable-active'));
+            }
+
+            renderAll();
+        }
+
+        // --- FORM & ACTION HANDLERS ---
+        window.handleAppSubmit = function(e) {
+            e.preventDefault();
+            const newApp = {
+                id: Date.now().toString(),
+                name: document.getElementById('app-name').value,
+                classRole: document.getElementById('app-class').value,
+                discord: document.getElementById('app-discord').value,
+                experience: document.getElementById('app-experience').value,
+                status: 'Pending',
+                date: new Date().toLocaleDateString()
+            };
+
+            if (!appData.applications) appData.applications = [];
+            appData.applications.unshift(newApp);
+            syncToCloud();
+            alert("Thank you! Your application has been submitted.");
+            document.getElementById('app-form').reset();
+        };
+
+        window.openEventModal = () => document.getElementById('event-modal').classList.remove('hidden');
+        window.closeEventModal = () => document.getElementById('event-modal').classList.add('hidden');
+        window.saveEvent = (e) => {
+            e.preventDefault();
+            if (!appData.events) appData.events = [];
+            appData.events.push({
+                id: Date.now().toString(),
+                title: document.getElementById('event-title').value,
+                date: document.getElementById('event-date').value,
+                tag: document.getElementById('event-tag').value || 'Event'
+            });
+            syncToCloud();
+            window.closeEventModal();
+        };
+        window.deleteEvent = (id) => {
+            appData.events = (appData.events || []).filter(e => e.id !== id);
+            syncToCloud();
+        };
+
+        window.openStatModal = () => document.getElementById('stat-modal').classList.remove('hidden');
+        window.closeStatModal = () => document.getElementById('stat-modal').classList.add('hidden');
+        window.saveStat = (e) => {
+            e.preventDefault();
+            if (!appData.stats) appData.stats = [];
+            appData.stats.push({
+                id: Date.now().toString(),
+                label: document.getElementById('stat-label').value,
+                value: document.getElementById('stat-value').value
+            });
+            syncToCloud();
+            window.closeStatModal();
+        };
+        window.deleteStat = (id) => {
+            appData.stats = (appData.stats || []).filter(s => s.id !== id);
+            syncToCloud();
+        };
+
+        window.openRuleModal = () => {
+            const ruleText = prompt("Enter new guild rule:");
+            if (ruleText) {
+                if (!appData.rules) appData.rules = [];
+                appData.rules.push({ id: Date.now().toString(), text: ruleText });
+                syncToCloud();
+            }
+        };
+        window.deleteRule = (id) => {
+            appData.rules = (appData.rules || []).filter(r => r.id !== id);
+            syncToCloud();
+        };
+
+        window.deleteApp = (id) => {
+            appData.applications = (appData.applications || []).filter(a => a.id !== id);
+            syncToCloud();
+        };
+
+        function escapeHtml(str) {
+            return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
+        }
+
+        // Initialize App & Setup Listeners
+        initAuth();
+        setupInlineEditors();
+    </script>
+</body>
+</html>
